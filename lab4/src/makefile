@@ -15,6 +15,14 @@ process_memory :
 parallel_sum : utils.o
 	$(CC) -pthread -o parallel_sum utils.o parallel_sum.c $(CFLAGS)
 
+parallel_sum_lib : utils.o  libsum
+	$(CC) -o parallel_sum utils.o parallel_sum.c -L/workspaces/os_lab_2019/lab4/src -lsum -pthread $(CFLAGS)
+
+libsum :
+	gcc -c sum.c -o sum.o
+	ar rcs libsum.a sum.o
+	rm sum.o
+
 utils.o : utils.h
 	$(CC) -o utils.o -c utils.c $(CFLAGS)
 
@@ -22,4 +30,4 @@ find_min_max.o : utils.h find_min_max.h
 	$(CC) -o find_min_max.o -c find_min_max.c $(CFLAGS)
 
 clean :
-	rm utils.o find_min_max.o parallel_min_max zombie process_memory parallel_sum
+	rm utils.o find_min_max.o parallel_min_max zombie process_memory parallel_sum libsum.a
