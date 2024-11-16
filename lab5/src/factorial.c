@@ -16,12 +16,12 @@ struct fact_args {
 
 void ParFact(void *args) {
   struct fact_args *str = (struct fact_args *)args;
-  pthread_mutex_lock(&mut);
   int buf = 1;
   for (int i = str->begin; i <= str->end; i++) {
     buf = ((buf * i) % (str->mod));
     printf("Buffer = %d\n", buf);
   }
+  pthread_mutex_lock(&mut);
   factorial = (factorial * buf) % str->mod;
   pthread_mutex_unlock(&mut);
 }
