@@ -181,7 +181,7 @@ int main(int argc, char **argv) {
   int status;
   int i = 0;
   while (active_child_processes > 0) {
-    waitpid(pids[i], &status, 0);
+    waitpid(pids[i], &status, WNOHANG);
     if (!WIFEXITED(status)) {
       printf("Child process %d did not exit normally\n", i);
     }
