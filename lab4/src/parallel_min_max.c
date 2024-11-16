@@ -151,7 +151,6 @@ int main(int argc, char **argv) {
         int pid_start = pid_size * i;
         int pid_end = (i == pnum - 1) ? array_size : pid_start + pid_size;
         struct MinMax pid_min_max = GetMinMax(array, pid_start, pid_end);
-        sleep(3);
         if (with_files) {
           char filename[256];
           // создаем имя файла с результатами для текущего процесса
