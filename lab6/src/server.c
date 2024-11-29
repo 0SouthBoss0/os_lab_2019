@@ -88,12 +88,14 @@ int main(int argc, char **argv) {
   int opt_val = 1;
   setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt_val, sizeof(opt_val));
 
+  // cвязываем сокет с адресом и портом
   int err = bind(server_fd, (struct sockaddr *)&server, sizeof(server));
   if (err < 0) {
     fprintf(stderr, "Can not bind to socket!\n");
     return 1;
   }
 
+  // переводим сокет в режим прослушивания входящих соединений
   err = listen(server_fd, 128);
   if (err < 0) {
     fprintf(stderr, "Could not listen on socket\n");
@@ -105,6 +107,7 @@ int main(int argc, char **argv) {
   while (true) {
     struct sockaddr_in client;
     socklen_t client_len = sizeof(client);
+    // принимаем входящее соединение на прослушивающем сокете
     int client_fd = accept(server_fd, (struct sockaddr *)&client, &client_len);
 
     if (client_fd < 0) {
@@ -115,6 +118,7 @@ int main(int argc, char **argv) {
     while (true) {
       unsigned int buffer_size = sizeof(uint64_t) * 3;
       char from_client[buffer_size];
+      // получаем данные из сокета
       ssize_t read_bytes = recv(client_fd, from_client, buffer_size, 0);
 
       if (!read_bytes) break;

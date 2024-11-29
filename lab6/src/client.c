@@ -27,6 +27,7 @@ struct ThreadArgs {
   uint64_t result;
 };
 
+// конвертация строки в 64-битное беззнаковое целое число
 bool ConvertStringToUI64(const char* str, uint64_t* val) {
   char* end = NULL;
   unsigned long long i = strtoull(str, &end, 10);
@@ -57,7 +58,8 @@ void* ProcessServerConnection(void* arg) {
     fprintf(stderr, "Socket creation failed!\n");
     pthread_exit(NULL);
   }
-
+  
+  // установка соединения с сервером
   if (connect(sck, (struct sockaddr*)&server, sizeof(server)) < 0) {
     fprintf(stderr, "Connection failed\n");
     close(sck);
@@ -69,14 +71,15 @@ void* ProcessServerConnection(void* arg) {
   memcpy(task, &args->begin, sizeof(uint64_t));
   memcpy(task + sizeof(uint64_t), &args->end, sizeof(uint64_t));
   memcpy(task + 2 * sizeof(uint64_t), &args->mod, sizeof(uint64_t));
-
+  
+  // отправка данных в сокет
   if (send(sck, task, sizeof(task), 0) < 0) {
     fprintf(stderr, "Send failed\n");
     close(sck);
     pthread_exit(NULL);
   }
 
-  // получение результата
+  // получение результата из сокета
   char response[sizeof(uint64_t)];
   if (recv(sck, response, sizeof(response), 0) < 0) {
     fprintf(stderr, "Receive failed\n");
@@ -108,9 +111,13 @@ struct Server* ReadServersFile(const char* filename, unsigned int* servers_num) 
     return NULL;
   }
 
+  // сброс указателя файла в начало
   rewind(file);
+
   int i = 0;
+  // fgets читает до символа новой строки или до конца файла
   while (fgets(line, sizeof(line), file)) {
+    // strtok используется для разделения строки line на токены
     char* ip = strtok(line, ":");
     char* port = strtok(NULL, "\n");
     if (ip && port) {

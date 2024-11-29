@@ -24,14 +24,18 @@ int main(int argc, char **argv) {
     exit(1);
   }
 
+  // инициализация структуры адреса сервера
   memset(&servaddr, 0, sizeof(servaddr));
   servaddr.sin_family = AF_INET;
   servaddr.sin_port = htons(atoi(argv[2]));
 
+  // преобразование IP-адреса из строки в бинарный формат
   if (inet_pton(AF_INET, argv[1], &servaddr.sin_addr) < 0) {
     perror("inet_pton problem");
     exit(1);
   }
+
+  // создание UDP-сокета
   if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
     perror("socket problem");
     exit(1);
@@ -39,12 +43,15 @@ int main(int argc, char **argv) {
 
   write(1, "Enter string\n", 13);
 
+  // цикл отправки и получения данных
   while ((n = read(0, sendline, BUFSIZE)) > 0) {
+    // отправка данных на сервер
     if (sendto(sockfd, sendline, n, 0, (SADDR *)&servaddr, SLEN) == -1) {
       perror("sendto problem");
       exit(1);
     }
 
+    // получение ответа от сервера
     if (recvfrom(sockfd, recvline, BUFSIZE, 0, NULL, NULL) == -1) {
       perror("recvfrom problem");
       exit(1);

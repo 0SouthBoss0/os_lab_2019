@@ -25,16 +25,19 @@ int main(int argc, char* argv[]) {
   struct sockaddr_in servaddr;
   struct sockaddr_in cliaddr;
 
+  // создание UDP-сокета
   if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
     perror("socket problem");
     exit(1);
   }
 
+  // инициализация структуры адреса сервера
   memset(&servaddr, 0, SLEN);
   servaddr.sin_family = AF_INET;
   servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
   servaddr.sin_port = htons(port);
 
+  // привязка сокета к адресу
   if (bind(sockfd, (SADDR *)&servaddr, SLEN) < 0) {
     perror("bind problem");
     exit(1);
@@ -43,7 +46,8 @@ int main(int argc, char* argv[]) {
 
   while (1) {
     unsigned int len = SLEN;
-
+    
+    // прием данных от клиента
     if ((n = recvfrom(sockfd, mesg, BUFSIZE, 0, (SADDR *)&cliaddr, &len)) < 0) {
       perror("recvfrom");
       exit(1);
@@ -54,6 +58,7 @@ int main(int argc, char* argv[]) {
            inet_ntop(AF_INET, (void *)&cliaddr.sin_addr.s_addr, ipadr, 16),
            ntohs(cliaddr.sin_port));
 
+    // отправка ответа клиенту
     if (sendto(sockfd, mesg, n, 0, (SADDR *)&cliaddr, len) < 0) {
       perror("sendto");
       exit(1);
